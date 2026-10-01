@@ -50,17 +50,25 @@ interface Props {
   onRefreshParent?: () => void;
 }
 
-const DEFAULT_PIN = '1015';
+const DEFAULT_PINS = ['1004', '1015'];
 const AUTH_STORAGE_KEY = 'BIBLE_ADMIN_AUTH_TOKEN_V1';
 const PIN_STORAGE_KEY = 'HOLY_SEED_ADMIN_PIN_KEY';
 
 function getStoredAdminPin(): string {
-  if (typeof window === 'undefined') return DEFAULT_PIN;
+  if (typeof window === 'undefined') return '1015';
   try {
-    return localStorage.getItem(PIN_STORAGE_KEY) || DEFAULT_PIN;
+    return localStorage.getItem(PIN_STORAGE_KEY) || '1015';
   } catch {
-    return DEFAULT_PIN;
+    return '1015';
   }
+}
+
+function checkIsPinValidLocally(pin: string): boolean {
+  const trimmed = pin.trim();
+  if (!trimmed) return false;
+  if (DEFAULT_PINS.includes(trimmed)) return true;
+  const customPin = getStoredAdminPin();
+  return trimmed === customPin;
 }
 
 export default function AdminDashboard({ 
@@ -215,10 +223,33 @@ export default function AdminDashboard({
   }, [isOpen, isAuthenticated]);
 
   // 관리자 PIN 확인
-  const handlePinSubmit = (e: React.FormEvent) => {
+  const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const correctPin = getStoredAdminPin();
-    if (pinInput.trim() === correctPin) {
+    const entered = pinInput.trim();
+    if (!entered) return;
+
+    let isValid = checkIsPinValidLocally(entered);
+
+    // 로컬 검증이 안 된 경우 서버의 저장된 비밀번호 API로도 확인
+    if (!isValid) {
+      try {
+        const res = await fetch('/api/admin/verify-pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: entered }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.valid) {
+            isValid = true;
+          }
+        }
+      } catch {
+        // 네트워크 오류 시 로컬 결과 유지
+      }
+    }
+
+    if (isValid) {
       setIsAuthenticated(true);
       sessionStorage.setItem(AUTH_STORAGE_KEY, 'true');
       setPinError(false);
@@ -238,24 +269,53 @@ export default function AdminDashboard({
   };
 
   // 관리자 비밀번호 변경 제출
-  const handleChangePinSubmit = (e: React.FormEvent) => {
+  const handleChangePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const currentValidPin = getStoredAdminPin();
-    if (currentPinCheck.trim() !== currentValidPin) {
+    const trimmedCurrent = currentPinCheck.trim();
+    const trimmedNew = newPinInput.trim();
+    const trimmedConfirm = confirmNewPinInput.trim();
+
+    let isCurrentValid = checkIsPinValidLocally(trimmedCurrent);
+
+    if (!isCurrentValid) {
+      try {
+        const verifyRes = await fetch('/api/admin/verify-pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: trimmedCurrent }),
+        });
+        if (verifyRes.ok) {
+          const data = await verifyRes.json();
+          if (data.valid) isCurrentValid = true;
+        }
+      } catch {
+        // fallback
+      }
+    }
+
+    if (!isCurrentValid) {
       setChangePinError('현재 비밀번호가 올바르지 않습니다.');
       return;
     }
-    if (!newPinInput.trim() || newPinInput.trim().length < 4) {
+    if (!trimmedNew || trimmedNew.length < 4) {
       setChangePinError('새 비밀번호는 4자리 이상 입력해 주세요.');
       return;
     }
-    if (newPinInput.trim() !== confirmNewPinInput.trim()) {
+    if (trimmedNew !== trimmedConfirm) {
       setChangePinError('새 비밀번호와 확인 입력이 일치하지 않습니다.');
       return;
     }
 
     try {
-      localStorage.setItem(PIN_STORAGE_KEY, newPinInput.trim());
+      localStorage.setItem(PIN_STORAGE_KEY, trimmedNew);
+
+      // 서버에도 동기화 저장
+      fetch('/api/admin/change-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPin: trimmedCurrent, newPin: trimmedNew }),
+      }).catch(() => {});
+
       showToast('관리자 비밀번호가 성공적으로 변경되었습니다.');
       setIsChangePinModalOpen(false);
       setCurrentPinCheck('');
@@ -755,7 +815,7 @@ export default function AdminDashboard({
                   <span>교사 및 사역자 보안 인증</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  본 화면은 교역자 및 담당 선생님 전용 공간입니다. 전달받으신 관리자 비밀번호를 입력해 주세요.
+                  본 화면은 교역자 및 담당 선생님 전용 공간입니다. 관리자 비밀번호(기본: <span className="font-bold text-indigo-600 dark:text-indigo-400">1004</span> 또는 <span className="font-bold text-indigo-600 dark:text-indigo-400">1015</span>)를 입력해 주세요.
                 </p>
               </div>
 
@@ -770,8 +830,8 @@ export default function AdminDashboard({
                         setPinInput(e.target.value);
                         setPinError(false);
                       }}
-                      placeholder="비밀번호 입력"
-                      className={`w-full pl-4 pr-11 py-3 text-center text-lg font-bold tracking-widest bg-slate-50 dark:bg-slate-900 border rounded-xl focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition ${
+                      placeholder="비밀번호 입력 (기본: 1004 또는 1015)"
+                      className={`w-full pl-4 pr-11 py-3 text-center text-sm sm:text-base font-bold tracking-widest bg-slate-50 dark:bg-slate-900 border rounded-xl focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition ${
                         pinError ? 'border-rose-400 bg-rose-50/50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300' : 'border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100'
                       }`}
                       autoFocus

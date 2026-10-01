@@ -257,7 +257,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, currentSes
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={role === 'student' ? '숫자 비밀번호 입력 (예: 1234)' : '비밀번호를 입력하세요'}
+                  placeholder={role === 'student' ? '숫자 비밀번호 입력 (예: 1234)' : '비밀번호 입력 (기본: 1004 또는 1015)'}
                   autoComplete="current-password"
                   inputMode={role === 'student' ? 'numeric' : 'text'}
                   className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold tracking-widest text-slate-800 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
@@ -271,9 +271,13 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, currentSes
                   {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
               </div>
-              {role === 'student' && (
+              {role === 'student' ? (
                 <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mt-1 font-medium leading-tight">
                   💡 처음 입력한 숫자가 내 비밀번호로 자동 저장됩니다. (비밀번호를 잊으면 교역자님께 물어보세요!)
+                </p>
+              ) : (
+                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mt-1 font-medium leading-tight">
+                  💡 선생님 및 관리자 기본 비밀번호는 <strong>1004</strong> 또는 <strong>1015</strong> 입니다.
                 </p>
               )}
             </div>

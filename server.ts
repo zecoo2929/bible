@@ -1,10 +1,9 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import { createServer as createViteServer } from 'vite';
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
 
@@ -12,6 +11,38 @@ app.use(express.json());
 const DATA_DIR = path.join(process.cwd(), 'data');
 const STUDENTS_FILE = path.join(DATA_DIR, 'students.json');
 const RANKINGS_FILE = path.join(DATA_DIR, 'rankings.json');
+const ADMIN_CONFIG_FILE = path.join(DATA_DIR, 'admin-config.json');
+
+// 서버 관리자 PIN 조회
+function getStoredAdminPinServer(): string {
+  try {
+    if (fs.existsSync(ADMIN_CONFIG_FILE)) {
+      const data = JSON.parse(fs.readFileSync(ADMIN_CONFIG_FILE, 'utf-8'));
+      if (data?.pin) return String(data.pin).trim();
+    }
+  } catch (e) {
+    // fallback
+  }
+  return '1015';
+}
+
+// 서버 관리자 PIN 저장
+function saveStoredAdminPinServer(newPin: string): boolean {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(
+      ADMIN_CONFIG_FILE,
+      JSON.stringify({ pin: newPin.trim(), updatedAt: new Date().toISOString() }, null, 2),
+      'utf-8'
+    );
+    return true;
+  } catch (e) {
+    console.error('Failed to save admin pin:', e);
+    return false;
+  }
+}
 
 function getTodayStr(offsetDays = 0): string {
   const d = new Date();
@@ -705,10 +736,15 @@ app.post('/api/auth/login', (req, res) => {
     });
   }
 
-  // 관리자/선생님/교역자 비밀번호 검증 (기본 1004 / 1015)
-  const validAdminPassword = trimmedPassword === '1004' || trimmedPassword === '1015';
+  // 관리자/선생님/교역자 비밀번호 검증 (기본 1004 / 1015 및 서버 저장 커스텀 비밀번호)
+  const serverAdminPin = getStoredAdminPinServer();
+  const validAdminPassword = 
+    trimmedPassword === '1004' || 
+    trimmedPassword === '1015' || 
+    (serverAdminPin && trimmedPassword === serverAdminPin);
+
   if (!validAdminPassword) {
-    return res.status(401).json({ error: '비밀번호가 올바르지 않습니다.' });
+    return res.status(401).json({ error: '비밀번호가 올바르지 않습니다. (기본 비밀번호: 1004 또는 1015)' });
   }
 
   // 2. 선생님 로그인
@@ -949,14 +985,58 @@ app.post('/api/admin/reset', (req, res) => {
   res.json({ success: true, message: 'Reset to initial sample students completed' });
 });
 
+// 8. [관리자 모드] 비밀번호 검증 API
+app.post('/api/admin/verify-pin', (req, res) => {
+  const { pin } = req.body;
+  const trimmed = String(pin || '').trim();
+  const serverAdminPin = getStoredAdminPinServer();
+  const isValid = 
+    trimmed === '1004' || 
+    trimmed === '1015' || 
+    (serverAdminPin && trimmed === serverAdminPin);
+
+  res.json({ success: true, valid: Boolean(isValid) });
+});
+
+// 9. [관리자 모드] 비밀번호 변경 API
+app.post('/api/admin/change-pin', (req, res) => {
+  const { currentPin, newPin } = req.body;
+  const trimmedCurrent = String(currentPin || '').trim();
+  const trimmedNew = String(newPin || '').trim();
+  const serverAdminPin = getStoredAdminPinServer();
+
+  const isCurrentValid = 
+    trimmedCurrent === '1004' || 
+    trimmedCurrent === '1015' || 
+    (serverAdminPin && trimmedCurrent === serverAdminPin);
+
+  if (!isCurrentValid) {
+    return res.status(400).json({ error: '현재 비밀번호가 올바르지 않습니다.' });
+  }
+
+  if (!trimmedNew || trimmedNew.length < 4) {
+    return res.status(400).json({ error: '새 비밀번호는 4자리 이상 입력해 주세요.' });
+  }
+
+  const saved = saveStoredAdminPinServer(trimmedNew);
+  if (saved) {
+    res.json({ success: true, message: '관리자 비밀번호가 성공적으로 변경되었습니다.' });
+  } else {
+    res.status(500).json({ error: '비밀번호 저장 중 오류가 발생했습니다.' });
+  }
+});
+
 // Health check API
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
+  const isDev = process.env.NODE_ENV === 'development' || !fs.existsSync(path.join(process.cwd(), 'dist', 'index.html'));
+
+  if (isDev) {
+    const { createServer } = await import('vite');
+    const vite = await createServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
