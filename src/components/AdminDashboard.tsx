@@ -648,31 +648,33 @@ export default function AdminDashboard({
       <div className="bg-slate-50 dark:bg-slate-900 w-full max-w-4xl min-h-[660px] max-h-[94vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
         
         {/* 상단 헤더 */}
-        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white px-5 py-4 flex justify-between items-center shrink-0 border-b border-white/10">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300">
+        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white px-4 sm:px-5 py-3.5 sm:py-4 flex justify-between items-center shrink-0 border-b border-white/10 gap-3 overflow-x-auto">
+          <div className="flex items-center space-x-3 shrink-0 whitespace-nowrap">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-white">교사 및 관리자 통합 센터</h2>
-                <span className="text-[10px] bg-indigo-500/30 text-indigo-200 px-2 py-0.5 rounded-md font-semibold border border-indigo-400/20">
-                  말씀 저널 & 통독 모니터링
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 mt-0.5">
-                학생들의 매일 성경 읽기와 5문장 저널(소감)을 실시간으로 확인하고 응원합니다
-              </p>
+            <div className="flex items-center gap-2 whitespace-nowrap">
+              <h2 className="text-base sm:text-lg font-black text-white whitespace-nowrap">관리자 모드</h2>
+              <span className="text-[10px] bg-indigo-500/30 text-indigo-200 px-2 py-0.5 rounded-md font-semibold border border-indigo-400/20 whitespace-nowrap">
+                말씀 저널 & 통독 모니터링
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 shrink-0 whitespace-nowrap">
             {currentUserSession && (
-              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded-xl text-xs border border-white/10">
-                <span className="font-extrabold text-amber-300">
-                  {currentUserSession.role === 'pastor' ? '✝️ 교역자' : `🧑‍🏫 ${currentUserSession.group || '교사'}`}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded-xl text-xs border border-white/10 whitespace-nowrap shrink-0">
+                <span className="font-extrabold text-amber-300 whitespace-nowrap">
+                  {currentUserSession.role === 'pastor'
+                    ? (currentUserSession.name && currentUserSession.name !== '교역자'
+                        ? `✝️ ${currentUserSession.name} 교역자`
+                        : '✝️ 교역자')
+                    : `🧑‍🏫 ${
+                        currentUserSession.name.includes('선생님')
+                          ? currentUserSession.name
+                          : `${currentUserSession.name || currentUserSession.group} 선생님`
+                      }`}
                 </span>
-                <span className="text-white/80">{currentUserSession.name}</span>
               </div>
             )}
             {isAuthenticated && (
@@ -681,11 +683,11 @@ export default function AdminDashboard({
                   <button
                     type="button"
                     onClick={onSwitchAccount}
-                    className="text-xs text-amber-200 hover:text-amber-100 bg-amber-500/20 hover:bg-amber-500/30 px-2.5 py-1.5 rounded-xl border border-amber-400/30 transition flex items-center gap-1"
+                    className="text-xs text-amber-200 hover:text-amber-100 bg-amber-500/20 hover:bg-amber-500/30 px-2.5 py-1.5 rounded-xl border border-amber-400/30 transition flex items-center gap-1 shrink-0 whitespace-nowrap"
                     title="다른 계정으로 로그인 / 전환"
                   >
-                    <User className="w-3.5 h-3.5" />
-                    <span>계정 전환</span>
+                    <User className="w-3.5 h-3.5 shrink-0" />
+                    <span className="whitespace-nowrap">계정 전환</span>
                   </button>
                 )}
                 <button
@@ -697,27 +699,27 @@ export default function AdminDashboard({
                     setConfirmNewPinInput('');
                     setIsChangePinModalOpen(true);
                   }}
-                  className="text-xs text-slate-300 hover:text-white px-2.5 py-1.5 rounded-xl hover:bg-white/10 transition flex items-center gap-1"
+                  className="text-xs text-slate-300 hover:text-white px-2.5 py-1.5 rounded-xl hover:bg-white/10 transition flex items-center gap-1 shrink-0 whitespace-nowrap"
                   title="관리자 비밀번호 변경"
                 >
-                  <KeyRound className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">비밀번호 변경</span>
+                  <KeyRound className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden sm:inline whitespace-nowrap">비밀번호 변경</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="text-xs text-slate-300 hover:text-white px-2.5 py-1.5 rounded-xl hover:bg-white/10 transition flex items-center gap-1"
+                  className="text-xs text-slate-300 hover:text-white px-2.5 py-1.5 rounded-xl hover:bg-white/10 transition flex items-center gap-1 shrink-0 whitespace-nowrap"
                   title="관리자 로그아웃"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">로그아웃</span>
+                  <LogOut className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden sm:inline whitespace-nowrap">로그아웃</span>
                 </button>
               </>
             )}
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition"
+              className="p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition shrink-0"
               aria-label="닫기"
             >
               <X className="w-5 h-5" />
@@ -810,62 +812,62 @@ export default function AdminDashboard({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {/* 전체 학생 / 담당 학생 */}
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] font-semibold text-slate-500">
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-semibold text-slate-500 whitespace-nowrap truncate block">
                       {isTeacher ? `${teacherName} 선생님 담당 학생` : '전체 학생'}
                     </span>
-                    <div className="text-xl font-black text-slate-900 mt-0.5">
+                    <div className="text-xl font-black text-slate-900 mt-0.5 whitespace-nowrap">
                       {targetStudents.length}명
                     </div>
                   </div>
-                  <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 ml-2">
                     <Users className="w-4 h-4" />
                   </div>
                 </div>
 
                 {/* 오늘 성경 말씀 완독 */}
                 <div className="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] font-semibold text-emerald-700">오늘 말씀 완독</span>
-                    <div className="text-xl font-black text-emerald-800 mt-0.5">
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-semibold text-emerald-700 whitespace-nowrap block">오늘 말씀 완독</span>
+                    <div className="text-xl font-black text-emerald-800 mt-0.5 whitespace-nowrap">
                       {targetStudents.filter(s => s.lastReadDate === todayStr).length}명
-                      <span className="text-[11px] font-bold text-emerald-600 ml-1.5">
+                      <span className="text-[11px] font-bold text-emerald-600 ml-1.5 whitespace-nowrap">
                         ({targetStudents.length > 0 ? Math.round((targetStudents.filter(s => s.lastReadDate === todayStr).length / targetStudents.length) * 100) : 0}%)
                       </span>
                     </div>
                   </div>
-                  <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 ml-2">
                     <BookOpen className="w-4 h-4" />
                   </div>
                 </div>
 
                 {/* 오늘 5문장 저널 작성 (신규 핵심 KPI) */}
                 <div className="bg-purple-50/70 p-3 rounded-2xl border border-purple-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] font-semibold text-purple-700">오늘 저널(소감) 작성</span>
-                    <div className="text-xl font-black text-purple-800 mt-0.5">
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-semibold text-purple-700 whitespace-nowrap block">오늘 저널(소감) 작성</span>
+                    <div className="text-xl font-black text-purple-800 mt-0.5 whitespace-nowrap">
                       {targetJournals.filter(j => j.date === todayStr).length}명
-                      <span className="text-[11px] font-bold text-purple-600 ml-1.5">
+                      <span className="text-[11px] font-bold text-purple-600 ml-1.5 whitespace-nowrap">
                         ({targetStudents.length > 0 ? Math.round((targetJournals.filter(j => j.date === todayStr).length / targetStudents.length) * 100) : 0}%)
                       </span>
                     </div>
                   </div>
-                  <div className="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 ml-2">
                     <PenTool className="w-4 h-4" />
                   </div>
                 </div>
 
                 {/* 평균 연속 일수 */}
                 <div className="bg-amber-50/60 p-3 rounded-2xl border border-amber-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] font-semibold text-amber-700">평균 연속 통독</span>
-                    <div className="text-xl font-black text-amber-800 mt-0.5">
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-semibold text-amber-700 whitespace-nowrap block">평균 연속 통독</span>
+                    <div className="text-xl font-black text-amber-800 mt-0.5 whitespace-nowrap">
                       {targetStudents.length > 0 
                         ? +(targetStudents.reduce((sum, s) => sum + (Number(s.streak) || 0), 0) / targetStudents.length).toFixed(1)
                         : (summary?.averageStreak ?? 0)}일
                     </div>
                   </div>
-                  <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 ml-2">
                     <Flame className="w-4 h-4" />
                   </div>
                 </div>
@@ -877,35 +879,35 @@ export default function AdminDashboard({
                   <button
                     type="button"
                     onClick={handleCopyAllTodayJournals}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-xl font-bold transition active:scale-95 shadow-2xs"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-xl font-bold transition active:scale-95 shadow-2xs whitespace-nowrap shrink-0"
                     title="오늘 작성된 전체 5문장 저널 모음 복사"
                   >
-                    <Quote className="w-3.5 h-3.5 text-purple-700" />
-                    <span>오늘 소감 전체 요약 복사</span>
+                    <Quote className="w-3.5 h-3.5 text-purple-700 shrink-0" />
+                    <span className="whitespace-nowrap">오늘 소감 전체 요약 복사</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleCopyWholeClassNotice}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl font-bold transition active:scale-95 shadow-2xs"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl font-bold transition active:scale-95 shadow-2xs whitespace-nowrap shrink-0"
                     title="단톡방에 올릴 출석 및 저널 현황 복사"
                   >
-                    <MessageSquare className="w-3.5 h-3.5 text-amber-700" />
-                    <span>단톡방 출석 공지 복사</span>
+                    <MessageSquare className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                    <span className="whitespace-nowrap">단톡방 출석 공지 복사</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleDownloadCSV}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition active:scale-95 shadow-2xs"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition active:scale-95 shadow-2xs whitespace-nowrap shrink-0"
                     title="저널 포함 학생 명단 엑셀(CSV) 다운로드"
                   >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>저널/명단 CSV 다운로드</span>
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="whitespace-nowrap">저널/명단 CSV 다운로드</span>
                   </button>
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 shrink-0 whitespace-nowrap">
                   <button
                     type="button"
                     onClick={() => {
@@ -913,16 +915,16 @@ export default function AdminDashboard({
                       fetchJournalsData();
                     }}
                     disabled={loading}
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium transition"
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium transition whitespace-nowrap shrink-0"
                     title="새로고침"
                   >
-                    <RotateCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                    <span>새로고침</span>
+                    <RotateCcw className={`w-3.5 h-3.5 shrink-0 ${loading ? 'animate-spin' : ''}`} />
+                    <span className="whitespace-nowrap">새로고침</span>
                   </button>
                   <button
                     type="button"
                     onClick={handleResetToDefaults}
-                    className="text-[11px] text-slate-400 hover:text-rose-600 px-2 py-1"
+                    className="text-[11px] text-slate-400 hover:text-rose-600 px-2 py-1 whitespace-nowrap shrink-0"
                     title="샘플 학생 데이터로 초기화"
                   >
                     데이터 리셋
@@ -932,35 +934,34 @@ export default function AdminDashboard({
             </div>
 
             {/* 상단 탭 전환: [말씀 저널(소감) 전체 열람] vs [학생 통독 & 출석 명단] */}
-            <div className="flex border-b border-slate-200 bg-white px-5 pt-2 shrink-0 gap-2">
+            <div className="flex border-b border-slate-200 bg-white px-5 pt-2 shrink-0 gap-2 overflow-x-auto">
               <button
                 type="button"
                 onClick={() => setAdminTab('journals')}
-                className={`pb-2.5 px-4 font-bold text-xs border-b-2 transition flex items-center gap-1.5 ${
+                className={`pb-2.5 px-4 font-bold text-xs border-b-2 transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                   adminTab === 'journals'
                     ? 'border-purple-600 text-purple-700 bg-purple-50/50 rounded-t-lg'
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                <PenTool className="w-4 h-4 text-purple-600" />
-                <span>말씀 저널(소감) 전체 열람</span>
-                <span className="bg-purple-100 text-purple-800 text-[10px] px-2 py-0.5 rounded-full font-black">
+                <PenTool className="w-4 h-4 text-purple-600 shrink-0" />
+                <span className="whitespace-nowrap">말씀 저널(소감) 전체 열람</span>
+                <span className="bg-purple-100 text-purple-800 text-[10px] px-2 py-0.5 rounded-full font-black whitespace-nowrap">
                   {journals.length}편
                 </span>
               </button>
-
               <button
                 type="button"
                 onClick={() => setAdminTab('students')}
-                className={`pb-2.5 px-4 font-bold text-xs border-b-2 transition flex items-center gap-1.5 ${
+                className={`pb-2.5 px-4 font-bold text-xs border-b-2 transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                   adminTab === 'students'
                     ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50 rounded-t-lg'
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                <Users className="w-4 h-4 text-indigo-600" />
-                <span>학생 출석 & 통독 명단</span>
-                <span className="bg-indigo-100 text-indigo-800 text-[10px] px-2 py-0.5 rounded-full font-black">
+                <Users className="w-4 h-4 text-indigo-600 shrink-0" />
+                <span className="whitespace-nowrap">학생 통독 & 출석 명단</span>
+                <span className="bg-indigo-100 text-indigo-800 text-[10px] px-2 py-0.5 rounded-full font-black whitespace-nowrap">
                   {students.length}명
                 </span>
               </button>
