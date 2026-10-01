@@ -1,0 +1,8 @@
+{
+  "name": "Remix Holy Seed 중고등부 말씀 저널링",
+  "description": "",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

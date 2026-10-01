@@ -1,0 +1,130 @@
+import { TitleItem, StreakTitleInfo } from '../types';
+
+export const STREAK_TITLES: TitleItem[] = [
+  {
+    id: 't1',
+    days: 1,
+    name: '초보 순례자',
+    icon: '🌱',
+    desc: '매일 말씀을 향한 거룩한 첫 발걸음을 뗀 순례자',
+    themeColor: 'emerald',
+    badgeBg: 'bg-emerald-100',
+    badgeText: 'text-emerald-700',
+    borderActive: 'border-emerald-200',
+    cardBgActive: 'bg-emerald-50/50',
+  },
+  {
+    id: 't2',
+    days: 3,
+    name: '새벽의 등불',
+    icon: '🕯️',
+    desc: '3일 동안 꺼지지 않고 어둠을 밝힌 기도의 불빛',
+    themeColor: 'amber',
+    badgeBg: 'bg-amber-100',
+    badgeText: 'text-amber-700',
+    borderActive: 'border-amber-200',
+    cardBgActive: 'bg-amber-50/50',
+  },
+  {
+    id: 't3',
+    days: 7,
+    name: '말씀의 탐험가',
+    icon: '📖',
+    desc: '일주일 동안 매일 성경 속 보물을 찾아낸 탐험가',
+    themeColor: 'blue',
+    badgeBg: 'bg-blue-100',
+    badgeText: 'text-blue-700',
+    borderActive: 'border-blue-200',
+    cardBgActive: 'bg-blue-50/50',
+  },
+  {
+    id: 't4',
+    days: 10,
+    name: '믿음의 싹',
+    icon: '🔥',
+    desc: '10일 동안 정성으로 믿음의 싹을 굳건히 틔운 성도',
+    themeColor: 'orange',
+    badgeBg: 'bg-orange-100',
+    badgeText: 'text-orange-700',
+    borderActive: 'border-orange-200',
+    cardBgActive: 'bg-orange-50/50',
+  },
+  {
+    id: 't5',
+    days: 15,
+    name: '진리의 방패',
+    icon: '🛡️',
+    desc: '15일간 매일 진리의 말씀으로 전신갑주를 입은 용사',
+    themeColor: 'indigo',
+    badgeBg: 'bg-indigo-100',
+    badgeText: 'text-indigo-700',
+    borderActive: 'border-indigo-200',
+    cardBgActive: 'bg-indigo-50/50',
+  },
+  {
+    id: 't6',
+    days: 20,
+    name: '은혜의 나무',
+    icon: '👑',
+    desc: '20일 동안 말씀의 시냇가에 깊이 뿌리내린 성도',
+    themeColor: 'purple',
+    badgeBg: 'bg-purple-100',
+    badgeText: 'text-purple-700',
+    borderActive: 'border-purple-200',
+    cardBgActive: 'bg-purple-50/50',
+  },
+  {
+    id: 't7',
+    days: 30,
+    name: '말씀의 거장',
+    icon: '🌟',
+    desc: '한 달간 온전히 말씀과 동행하며 영적 성숙을 이룬 거장',
+    themeColor: 'amber',
+    badgeBg: 'bg-amber-100',
+    badgeText: 'text-amber-800',
+    borderActive: 'border-amber-300',
+    cardBgActive: 'bg-amber-50/60',
+  },
+  {
+    id: 't8',
+    days: 50,
+    name: '영의 파수꾼',
+    icon: '🕊️',
+    desc: '50일 동안 깨어 흔들림 없이 성전을 지킨 신실한 파수꾼',
+    themeColor: 'teal',
+    badgeBg: 'bg-teal-100',
+    badgeText: 'text-teal-700',
+    borderActive: 'border-teal-200',
+    cardBgActive: 'bg-teal-50/50',
+  },
+  {
+    id: 't9',
+    days: 100,
+    name: '생명의 면류관',
+    icon: '💎',
+    desc: '100일간 온전한 헌신으로 말씀을 완주한 영광의 승리자',
+    themeColor: 'rose',
+    badgeBg: 'bg-rose-100',
+    badgeText: 'text-rose-700',
+    borderActive: 'border-rose-200',
+    cardBgActive: 'bg-rose-50/50',
+  },
+];
+
+export const getStreakTitle = (days: number): StreakTitleInfo => {
+  const unlockedTitles = STREAK_TITLES.filter(t => days >= t.days);
+  if (unlockedTitles.length > 0) {
+    const highest = unlockedTitles[unlockedTitles.length - 1];
+    return {
+      title: highest.name,
+      color: `${highest.badgeText} ${highest.badgeBg}`,
+      item: highest,
+    };
+  }
+  const defaultTitle = STREAK_TITLES[0];
+  return {
+    title: defaultTitle.name,
+    color: `${defaultTitle.badgeText} ${defaultTitle.badgeBg}`,
+    item: defaultTitle,
+  };
+};

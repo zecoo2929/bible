@@ -1,0 +1,260 @@
+[
+  {
+    "id": "seed_1",
+    "name": "김다윗",
+    "group": "손충의",
+    "streak": 21,
+    "bestStreak": 21,
+    "level": 5,
+    "exp": 280,
+    "totalDaysRead": 25,
+    "lastReadDate": "2026-09-16",
+    "lastQuizDate": "2026-09-16",
+    "titleName": "은혜의 나무",
+    "titleIcon": "👑",
+    "avatarEmoji": "👑",
+    "lastActive": "2026-09-16T10:28:13.420Z",
+    "createdAt": "2026-08-22",
+    "note": "손충의 선생님 반. 매일 새벽 말씀 통독 솔선수범",
+    "completedHistory": {
+      "2026-09-16": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "시편 23편"
+      },
+      "2026-09-15": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "잠언 3:5-6"
+      },
+      "2026-09-14": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "요한복음 14:6"
+      }
+    },
+    "password": "david2026"
+  },
+  {
+    "id": "seed_2",
+    "name": "박하은",
+    "group": "이윤정",
+    "streak": 15,
+    "bestStreak": 18,
+    "level": 4,
+    "exp": 150,
+    "totalDaysRead": 20,
+    "lastReadDate": "2026-09-16",
+    "lastQuizDate": "2026-09-15",
+    "titleName": "진리의 방패",
+    "titleIcon": "🛡️",
+    "avatarEmoji": "🛡️",
+    "lastActive": "2026-09-16T10:28:13.420Z",
+    "createdAt": "2026-08-27",
+    "note": "이윤정 선생님 반. 소감 나눔이 솔직하고 깊이 있음",
+    "completedHistory": {
+      "2026-09-16": {
+        "read": true,
+        "quiz": false,
+        "verseBook": "시편 23편"
+      },
+      "2026-09-15": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "잠언 3:5-6"
+      }
+    },
+    "password": "1004"
+  },
+  {
+    "id": "seed_3",
+    "name": "이요한",
+    "group": "한다현",
+    "streak": 10,
+    "bestStreak": 12,
+    "level": 3,
+    "exp": 90,
+    "totalDaysRead": 14,
+    "lastReadDate": "2026-09-15",
+    "lastQuizDate": "2026-09-15",
+    "titleName": "믿음의 싹",
+    "titleIcon": "🔥",
+    "avatarEmoji": "🔥",
+    "lastActive": "2026-09-15T10:28:13.420Z",
+    "createdAt": "2026-09-01",
+    "note": "한다현 선생님 반. 저녁 말씀 통독 진행 중",
+    "completedHistory": {
+      "2026-09-15": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "잠언 3:5-6"
+      },
+      "2026-09-14": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "요한복음 14:6"
+      }
+    },
+    "password": "1004"
+  },
+  {
+    "id": "seed_4",
+    "name": "정에스더",
+    "group": "이재구",
+    "streak": 8,
+    "bestStreak": 14,
+    "level": 3,
+    "exp": 240,
+    "totalDaysRead": 19,
+    "lastReadDate": "2026-09-16",
+    "lastQuizDate": "2026-09-16",
+    "titleName": "말씀의 탐험가",
+    "titleIcon": "📖",
+    "avatarEmoji": "📖",
+    "lastActive": "2026-09-16T10:28:13.420Z",
+    "createdAt": "2026-08-25",
+    "note": "이재구 선생님 반. 또래 학생 독려 리더십 우수",
+    "completedHistory": {
+      "2026-09-16": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "시편 23편"
+      },
+      "2026-09-15": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "잠언 3:5-6"
+      }
+    },
+    "password": "1004"
+  },
+  {
+    "id": "seed_5",
+    "name": "강은혜",
+    "group": "손충의",
+    "streak": 12,
+    "bestStreak": 12,
+    "level": 4,
+    "exp": 70,
+    "totalDaysRead": 16,
+    "lastReadDate": "2026-09-16",
+    "lastQuizDate": "2026-09-16",
+    "titleName": "말씀의 탐험가",
+    "titleIcon": "🌟",
+    "avatarEmoji": "🌟",
+    "lastActive": "2026-09-16T10:28:13.420Z",
+    "createdAt": "2026-08-29",
+    "note": "손충의 선생님 반. 매일 정성스럽게 5문장 소감 작성",
+    "completedHistory": {
+      "2026-09-16": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "시편 23편"
+      }
+    },
+    "password": "1004"
+  },
+  {
+    "id": "seed_6",
+    "name": "최사무엘",
+    "group": "이윤정",
+    "streak": 4,
+    "bestStreak": 7,
+    "level": 2,
+    "exp": 110,
+    "totalDaysRead": 9,
+    "lastReadDate": "2026-09-13",
+    "lastQuizDate": "2026-09-13",
+    "titleName": "새벽의 등불",
+    "titleIcon": "🕯️",
+    "avatarEmoji": "🕯️",
+    "lastActive": "2026-09-13T10:28:13.420Z",
+    "createdAt": "2026-09-04",
+    "note": "이윤정 선생님 반. 격려와 심방 필요",
+    "completedHistory": {
+      "2026-09-13": {
+        "read": true,
+        "quiz": true,
+        "verseBook": "빌립보서 4:13"
+      }
+    },
+    "password": "1004"
+  },
+  {
+    "id": "seed_7",
+    "name": "한마리아",
+    "group": "한다현",
+    "streak": 2,
+    "bestStreak": 5,
+    "level": 1,
+    "exp": 80,
+    "totalDaysRead": 5,
+    "lastReadDate": "2026-09-16",
+    "lastQuizDate": "",
+    "titleName": "초보 순례자",
+    "titleIcon": "🌱",
+    "avatarEmoji": "🌱",
+    "lastActive": "2026-09-16T10:28:13.420Z",
+    "createdAt": "2026-09-11",
+    "note": "한다현 선생님 반. 성경 통독 습관 형성 중",
+    "completedHistory": {
+      "2026-09-16": {
+        "read": true,
+        "quiz": false,
+        "verseBook": "시편 23편"
+      },
+      "2026-09-15": {
+        "read": true,
+        "quiz": false,
+        "verseBook": "잠언 3:5-6"
+      }
+    },
+    "password": "1004"
+  },
+  {
+    "id": "seed_8",
+    "name": "임바울",
+    "group": "이재구",
+    "streak": 0,
+    "bestStreak": 9,
+    "level": 2,
+    "exp": 40,
+    "totalDaysRead": 9,
+    "lastReadDate": "2026-09-14",
+    "lastQuizDate": "2026-09-14",
+    "titleName": "초보 순례자",
+    "titleIcon": "✝️",
+    "avatarEmoji": "✝️",
+    "lastActive": "2026-09-14T10:28:13.420Z",
+    "createdAt": "2026-09-01",
+    "note": "이재구 선생님 반. 시험 기간 후 복귀 독려",
+    "completedHistory": {
+      "2026-09-14": {
+        "read": true,
+        "quiz": false,
+        "verseBook": "요한복음 14:6"
+      }
+    },
+    "password": "1004"
+  },
+  {
+    "id": "student_icwakga",
+    "name": "교역자",
+    "password": "1",
+    "group": "손충의",
+    "streak": 0,
+    "bestStreak": 0,
+    "level": 1,
+    "exp": 0,
+    "totalDaysRead": 0,
+    "lastReadDate": "",
+    "lastQuizDate": "",
+    "titleName": "초보 순례자",
+    "titleIcon": "🌱",
+    "avatarEmoji": "🌱",
+    "lastActive": "2026-10-01T00:26:55.097Z",
+    "createdAt": "2026-10-01",
+    "completedHistory": {},
+    "journals": {}
+  }
+]
