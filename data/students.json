@@ -236,25 +236,5 @@
       }
     },
     "password": "1004"
-  },
-  {
-    "id": "student_icwakga",
-    "name": "교역자",
-    "password": "1",
-    "group": "손충의",
-    "streak": 0,
-    "bestStreak": 0,
-    "level": 1,
-    "exp": 0,
-    "totalDaysRead": 0,
-    "lastReadDate": "",
-    "lastQuizDate": "",
-    "titleName": "초보 순례자",
-    "titleIcon": "🌱",
-    "avatarEmoji": "🌱",
-    "lastActive": "2026-10-01T00:26:55.097Z",
-    "createdAt": "2026-10-01",
-    "completedHistory": {},
-    "journals": {}
   }
 ]

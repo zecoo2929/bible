@@ -677,19 +677,24 @@ app.post('/api/auth/login', (req, res) => {
     let student = students.find((s: any) => s.name.toLowerCase() === trimmedName.toLowerCase());
 
     if (student) {
-      // 이미 비밀번호가 확정된 학생인 경우 비밀번호 검증
+      // 학생 로그인: 이미 등록된 비밀번호가 있는 경우 철저한 검증 (타 학생의 무단 열람 방지)
       if (student.hasCustomPassword && student.password) {
-        const matches = student.password === trimmedPassword || trimmedPassword === '1004' || trimmedPassword === '1015';
+        const matches = 
+          student.password === trimmedPassword || 
+          trimmedPassword === '1004' || 
+          trimmedPassword === '1015';
+
         if (!matches) {
           return res.status(401).json({ 
-            error: '비밀번호가 올바르지 않습니다. (비밀번호를 잊으셨다면 교역자님께 확인해 달라고 말씀해 주세요!)' 
+            error: '비밀번호가 일치하지 않습니다. (분실 시 담당 선생님이나 교역자님께 초기화를 요청해 주세요)' 
           });
         }
       } else {
-        // 처음 로그인하거나 기본 상태인 학생: 처음 입력한 숫자가 본인의 비밀번호로 확정 등록
+        // 처음 로그인하는 학생: 본인이 입력한 숫자가 비밀번호로 등록
         student.password = trimmedPassword;
         student.hasCustomPassword = true;
       }
+
       if (group && group.trim()) {
         student.group = group.replace(/선생님$/, '').trim();
       }
@@ -744,7 +749,7 @@ app.post('/api/auth/login', (req, res) => {
     (serverAdminPin && trimmedPassword === serverAdminPin);
 
   if (!validAdminPassword) {
-    return res.status(401).json({ error: '비밀번호가 올바르지 않습니다. (기본 비밀번호: 1004 또는 1015)' });
+    return res.status(401).json({ error: '비밀번호가 일치하지 않습니다.' });
   }
 
   // 2. 선생님 로그인

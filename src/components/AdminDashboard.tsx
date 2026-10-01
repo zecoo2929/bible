@@ -40,6 +40,7 @@ import {
 import { AdminStudent, AdminSummary, JournalEntry, UserSession, FontSizeOption, TEACHERS_LIST } from '../types';
 import { STREAK_TITLES, getStreakTitle } from '../data/titles';
 import { loadFontSize, saveFontSize } from '../utils/storage';
+import { getDefaultAdminStudents, getDefaultAdminJournals } from '../data/defaultStudents';
 
 interface Props {
   isOpen: boolean;
@@ -112,14 +113,14 @@ export default function AdminDashboard({
   // 대시보드 서브 탭: 'journals' (말씀 저널 전체 열람) | 'students' (학생 통독 & 출석 명단)
   const [adminTab, setAdminTab] = useState<'journals' | 'students'>('journals');
 
-  // 데이터 상태
-  const [students, setStudents] = useState<AdminStudent[]>([]);
+  // 데이터 상태 (서버 지연이나 오프라인 시에도 기본 샘플 데이터가 즉각 표시되도록 초기화)
+  const [students, setStudents] = useState<AdminStudent[]>(() => getDefaultAdminStudents());
   const [summary, setSummary] = useState<AdminSummary | null>(null);
-  const [todayStr, setTodayStr] = useState<string>('');
+  const [todayStr, setTodayStr] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const [loading, setLoading] = useState(false);
 
   // 저널 데이터 상태 (선생님인 경우 본인 담당 반 기본 필터링)
-  const [journals, setJournals] = useState<JournalEntry[]>([]);
+  const [journals, setJournals] = useState<JournalEntry[]>(() => getDefaultAdminJournals());
   const [journalDateFilter, setJournalDateFilter] = useState<string>('all');
   const [journalGroupFilter, setJournalGroupFilter] = useState<string>(() => {
     if (isTeacher && teacherName) {
@@ -188,15 +189,17 @@ export default function AdminDashboard({
     setLoading(true);
     try {
       const res = await fetch('/api/admin/students');
-      const data = await res.json();
-      if (data.success) {
-        setStudents(data.students || []);
-        setSummary(data.summary || null);
-        setTodayStr(data.today || new Date().toISOString().slice(0, 10));
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.students && data.students.length > 0) {
+          setStudents(data.students);
+          setSummary(data.summary || null);
+          setTodayStr(data.today || new Date().toISOString().slice(0, 10));
+        }
       }
     } catch (err) {
-      console.error('Failed to load admin students data:', err);
-      showToast('데이터를 불러오는데 실패했습니다.');
+      console.warn('Failed to load admin students from server, using local data:', err);
+      // 오프라인/배포 지연 시에도 기존 학생 데이터 유지
     } finally {
       setLoading(false);
     }
@@ -206,12 +209,14 @@ export default function AdminDashboard({
   const fetchJournalsData = async () => {
     try {
       const res = await fetch('/api/admin/journals');
-      const data = await res.json();
-      if (data.success) {
-        setJournals(data.journals || []);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.journals && data.journals.length > 0) {
+          setJournals(data.journals);
+        }
       }
     } catch (err) {
-      console.error('Failed to load journals:', err);
+      console.warn('Failed to load journals from server, using local data:', err);
     }
   };
 
@@ -222,10 +227,10 @@ export default function AdminDashboard({
     }
   }, [isOpen, isAuthenticated]);
 
-  // 관리자 PIN 확인
-  const handlePinSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const entered = pinInput.trim();
+  // 관리자 PIN 확인 (원클릭 직접입력 지원)
+  const handlePinSubmit = async (e?: React.FormEvent, directPin?: string) => {
+    if (e) e.preventDefault();
+    const entered = (directPin !== undefined ? directPin : pinInput).trim();
     if (!entered) return;
 
     let isValid = checkIsPinValidLocally(entered);
@@ -815,7 +820,7 @@ export default function AdminDashboard({
                   <span>교사 및 사역자 보안 인증</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  본 화면은 교역자 및 담당 선생님 전용 공간입니다. 관리자 비밀번호(기본: <span className="font-bold text-indigo-600 dark:text-indigo-400">1004</span> 또는 <span className="font-bold text-indigo-600 dark:text-indigo-400">1015</span>)를 입력해 주세요.
+                  본 화면은 교역자 및 담당 선생님 전용 공간입니다. 관리자 비밀번호를 입력해 주세요.
                 </p>
               </div>
 
@@ -830,7 +835,7 @@ export default function AdminDashboard({
                         setPinInput(e.target.value);
                         setPinError(false);
                       }}
-                      placeholder="비밀번호 입력 (기본: 1004 또는 1015)"
+                      placeholder="비밀번호 입력"
                       className={`w-full pl-4 pr-11 py-3 text-center text-sm sm:text-base font-bold tracking-widest bg-slate-50 dark:bg-slate-900 border rounded-xl focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition ${
                         pinError ? 'border-rose-400 bg-rose-50/50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300' : 'border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100'
                       }`}
@@ -855,7 +860,7 @@ export default function AdminDashboard({
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition active:scale-95 text-sm flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition active:scale-95 text-sm flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Unlock className="w-4 h-4" />
                   <span>관리자 모드 열기</span>

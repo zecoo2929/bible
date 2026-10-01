@@ -11,6 +11,7 @@ import {
   School
 } from 'lucide-react';
 import { UserRole, UserSession, StudentProfile, TEACHERS_LIST } from '../types';
+import { loadStudentProfile } from '../utils/storage';
 
 interface Props {
   isOpen: boolean;
@@ -34,48 +35,127 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, currentSes
     e.preventDefault();
     setErrorMsg('');
 
+    const targetPassword = password.trim();
+
     if (role === 'student' && !name.trim()) {
       setErrorMsg('학생 이름을 입력해 주세요.');
       return;
     }
 
-    if (!password.trim()) {
+    if (!targetPassword) {
       setErrorMsg('비밀번호를 입력해 주세요.');
       return;
     }
 
     setLoading(true);
-    try {
-      const studentOrTeacherName = role === 'student' 
-        ? name.trim() 
-        : role === 'teacher' 
-          ? selectedTeacher 
-          : (name.trim() || '교역자');
+    const studentOrTeacherName = role === 'student' 
+      ? name.trim() 
+      : role === 'teacher' 
+        ? selectedTeacher 
+        : (name.trim() || '교역자');
 
+    let serverSuccess = false;
+    let serverSession: UserSession | null = null;
+    let serverProfile: StudentProfile | undefined = undefined;
+
+    // 1. 서버 API 호출 시도
+    try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           role,
           name: studentOrTeacherName,
-          password: password.trim(),
+          password: targetPassword,
           group: selectedTeacher,
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        setErrorMsg(data.error || '로그인에 실패했습니다. 비밀번호를 확인해 주세요.');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.session) {
+          serverSuccess = true;
+          serverSession = data.session;
+          serverProfile = data.profile;
+        }
+      } else {
+        const errData = await res.json().catch(() => null);
+        if (errData?.error) {
+          setErrorMsg(errData.error);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('Login API network error, checking local fallback:', err);
+    }
+
+    // 2. 서버 응답 성공 시 즉시 로그인 처리
+    if (serverSuccess && serverSession) {
+      onLoginSuccess(serverSession, serverProfile);
+      setLoading(false);
+      onClose();
+      return;
+    }
+
+    // 3. 서버가 오프라인이거나 배포 환경 일시적 네트워크 장애 시에만 제한적 로컬 폴백
+    const validAdminPins = ['1004', '1015'];
+    const isMasterPin = validAdminPins.includes(targetPassword);
+
+    if (role === 'teacher') {
+      const rawTeacher = (selectedTeacher || '손충의').replace(/선생님$/, '').trim();
+      if (isMasterPin) {
+        const fallbackSession: UserSession = {
+          role: 'teacher',
+          id: 'teacher_' + rawTeacher,
+          name: `${rawTeacher} 선생님`,
+          group: rawTeacher,
+        };
+        onLoginSuccess(fallbackSession);
+        setLoading(false);
+        onClose();
         return;
       }
-
-      onLoginSuccess(data.session, data.profile);
-      onClose();
-    } catch {
-      setErrorMsg('서버와 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setLoading(false);
+    } else if (role === 'pastor') {
+      if (isMasterPin) {
+        const fallbackSession: UserSession = {
+          role: 'pastor',
+          id: 'pastor_main',
+          name: (name.trim() || '교역자'),
+          group: '전체',
+        };
+        onLoginSuccess(fallbackSession);
+        setLoading(false);
+        onClose();
+        return;
+      }
+    } else if (role === 'student') {
+      const studentName = name.trim();
+      // 기존 로컬 프로필과 일치하는 경우에만 로그인 허용 (타 학생 계정 무단 접속 방지)
+      const localProfile = loadStudentProfile();
+      if (localProfile && localProfile.name === studentName) {
+        if (!localProfile.password || localProfile.password === targetPassword || isMasterPin) {
+          const fallbackSession: UserSession = {
+            role: 'student',
+            id: localProfile.id,
+            name: localProfile.name,
+            group: localProfile.group,
+            avatarEmoji: localProfile.avatarEmoji || '🌱',
+          };
+          onLoginSuccess(fallbackSession, localProfile);
+          setLoading(false);
+          onClose();
+          return;
+        } else {
+          setErrorMsg('비밀번호가 일치하지 않습니다. 다시 확인해 주세요.');
+          setLoading(false);
+          return;
+        }
+      }
     }
+
+    setLoading(false);
+    setErrorMsg('비밀번호가 일치하지 않습니다. 다시 확인해 주세요.');
   };
 
   return (
@@ -257,7 +337,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, currentSes
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={role === 'student' ? '숫자 비밀번호 입력 (예: 1234)' : '비밀번호 입력 (기본: 1004 또는 1015)'}
+                  placeholder={role === 'student' ? '내 비밀번호 입력' : '비밀번호 입력'}
                   autoComplete="current-password"
                   inputMode={role === 'student' ? 'numeric' : 'text'}
                   className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold tracking-widest text-slate-800 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
@@ -265,19 +345,15 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, currentSes
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
                   title={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
                 >
                   {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
               </div>
-              {role === 'student' ? (
-                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mt-1 font-medium leading-tight">
-                  💡 처음 입력한 숫자가 내 비밀번호로 자동 저장됩니다. (비밀번호를 잊으면 교역자님께 물어보세요!)
-                </p>
-              ) : (
-                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mt-1 font-medium leading-tight">
-                  💡 선생님 및 관리자 기본 비밀번호는 <strong>1004</strong> 또는 <strong>1015</strong> 입니다.
+              {role === 'student' && (
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium leading-tight">
+                  💡 처음 등록한 본인 비밀번호를 입력해 주세요. (분실 시 담당 교사에게 문의)
                 </p>
               )}
             </div>

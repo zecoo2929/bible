@@ -175,7 +175,8 @@ export default function BibleGameApp() {
       setJournalSaveFeedback(`${session.name} 학생으로 로그인되었습니다!`);
     } else if (session.role === 'teacher') {
       setIsAdminDashboardOpen(true);
-      setJournalSaveFeedback(`${session.name} (${session.group}) 선생님으로 로그인되었습니다.`);
+      const tName = session.name.includes('선생님') ? session.name : `${session.name} 선생님`;
+      setJournalSaveFeedback(`${tName}으로 로그인되었습니다. 관리자 모드를 시작합니다.`);
     } else if (session.role === 'pastor') {
       setIsAdminDashboardOpen(true);
       setJournalSaveFeedback(`${session.name}으로 로그인되었습니다. 모든 학생 저널을 열람하실 수 있습니다.`);
