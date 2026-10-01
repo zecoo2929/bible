@@ -1037,7 +1037,7 @@ app.get('/api/health', (req, res) => {
 });
 
 async function startServer() {
-  const isDev = process.env.NODE_ENV === 'development' || !fs.existsSync(path.join(process.cwd(), 'dist', 'index.html'));
+  const isDev = process.env.NODE_ENV === 'development';
 
   if (isDev) {
     const { createServer } = await import('vite');
@@ -1048,14 +1048,42 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+    }
+
+    // 미등록 API 요청 시 JSON 404 응답 (HTML 반환 방지)
+    app.all('/api/*', (req, res) => {
+      res.status(404).json({ error: 'API route not found' });
+    });
+
+    // SPA 클라이언트 라우팅 서빙
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      const indexPath = path.join(distPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.send('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Remix Holy Seed 말씀 저널링</title></head><body>서버가 준비 중입니다. 잠시 후 새로고침해 주세요.</body></html>');
+      }
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Bible Level Up Server running on http://0.0.0.0:${PORT}`);
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Holy Seed Server running on http://0.0.0.0:${PORT} (mode: ${isDev ? 'development' : 'production'})`);
+  });
+
+  // Cloud Run / Docker 컨테이너 종료 신호 안전 처리
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, closing HTTP server...');
+    server.close(() => {
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGINT', () => {
+    server.close(() => {
+      process.exit(0);
+    });
   });
 }
 

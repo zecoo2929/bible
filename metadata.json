@@ -1,6 +1,6 @@
 {
   "name": "Remix Holy Seed 중고등부 말씀 저널링",
-  "description": "",
+  "description": "매일 성경 말씀 읽기와 5문장 묵상 저널링을 통해 영적 성장을 이루는 게이미피케이션 말씀 앱",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
